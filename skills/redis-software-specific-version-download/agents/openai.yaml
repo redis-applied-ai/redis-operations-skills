@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Version Download"
+  short_description: "Request exact Redis Software builds"
+  default_prompt: "Use $redis-software-specific-version-download to request or validate a specific Redis Software installer version."

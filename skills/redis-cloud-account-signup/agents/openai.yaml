@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Account Signup"
+  short_description: "Create and troubleshoot Redis Cloud accounts"
+  default_prompt: "Use $redis-cloud-account-signup to help create or troubleshoot a Redis Cloud account signup."

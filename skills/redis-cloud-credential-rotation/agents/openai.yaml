@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Credential Rotation"
+  short_description: "Rotate Redis Cloud credentials safely"
+  default_prompt: "Use $redis-cloud-credential-rotation to plan or troubleshoot Redis Cloud credential rotation."

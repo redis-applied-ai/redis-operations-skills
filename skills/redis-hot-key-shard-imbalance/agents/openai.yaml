@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Hot Key Imbalance"
+  short_description: "Fix hot shard/key imbalance"
+  default_prompt: "Use $redis-hot-key-shard-imbalance to diagnose and remediate Redis hot keys overloading a shard."

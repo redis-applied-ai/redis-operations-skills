@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Insight Install"
+  short_description: "Install and configure Redis Insight"
+  default_prompt: "Use $redis-insight-install-config to install, configure, or troubleshoot Redis Insight."

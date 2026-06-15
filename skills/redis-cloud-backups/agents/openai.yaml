@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Backups"
+  short_description: "Configure Redis Cloud database backups"
+  default_prompt: "Use $redis-cloud-backups to configure or troubleshoot Redis Cloud database backups."

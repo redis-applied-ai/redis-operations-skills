@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software DROPINDEX Cleanup"
+  short_description: "Clean up Redis Software index leftovers"
+  default_prompt: "Use $redis-software-search-dropindex-dd-cleanup to troubleshoot leftover keys after FT.DROPINDEX DD in Redis Software."

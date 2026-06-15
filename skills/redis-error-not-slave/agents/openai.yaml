@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis ERROR NOT SLAVE"
+  short_description: "Resolve Redis shard role mismatch errors"
+  default_prompt: "Use $redis-error-not-slave to diagnose and resolve an ERROR: NOT SLAVE shard role mismatch."

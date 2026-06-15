@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Cost Report"
+  short_description: "Analyze Redis Cloud cost CSVs"
+  default_prompt: "Use $redis-cloud-cost-report-analysis to download, interpret, or visualize a Redis Cloud Cost Report."

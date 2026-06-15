@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Index Documents"
+  short_description: "Index JSON and hash data in Redis Software"
+  default_prompt: "Use $redis-software-index-documents to troubleshoot missing documents in a Redis Software Search index."

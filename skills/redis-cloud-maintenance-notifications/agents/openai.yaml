@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Maintenance Notifications"
+  short_description: "Manage Redis Cloud maintenance notices"
+  default_prompt: "Use $redis-cloud-maintenance-notifications to configure or troubleshoot Redis Cloud maintenance emails."

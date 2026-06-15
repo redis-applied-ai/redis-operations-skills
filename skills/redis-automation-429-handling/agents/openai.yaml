@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Automation 429 Handling"
+  short_description: "Reduce 429s in Redis automation"
+  default_prompt: "Use $redis-automation-429-handling to troubleshoot 429 errors in a Redis Cloud API or CI/CD workflow."

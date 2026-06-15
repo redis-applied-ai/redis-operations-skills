@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Failover Test"
+  short_description: "Plan Redis Cloud failover tests"
+  default_prompt: "Use $redis-cloud-failover-test to plan, schedule, or validate a Redis Cloud failover test."

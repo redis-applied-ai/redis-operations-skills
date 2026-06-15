@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Firewalld"
+  short_description: "Configure firewalld for Redis Software"
+  default_prompt: "Use $redis-software-firewalld to configure or debug firewalld rules for Redis Software."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Flex VAT GST Error"
+  short_description: "Fix Flex VAT/GST creation errors"
+  default_prompt: "Use $redis-cloud-flex-vat-gst-error to troubleshoot Redis Cloud Flex creation errors caused by VAT/GST formatting."

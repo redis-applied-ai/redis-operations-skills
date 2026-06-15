@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Installation"
+  short_description: "Install Redis Software on nodes"
+  default_prompt: "Use $redis-software-installation to install and validate Redis Software on prepared nodes."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Scale Up or Out"
+  short_description: "Choose Redis scaling direction"
+  default_prompt: "Use $redis-scale-up-scale-out to choose and validate Redis scaling options."

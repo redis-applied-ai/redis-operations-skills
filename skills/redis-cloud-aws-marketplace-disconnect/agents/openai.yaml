@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis AWS Marketplace Disconnect"
+  short_description: "Disconnect AWS Marketplace billing"
+  default_prompt: "Use $redis-cloud-aws-marketplace-disconnect to safely disconnect Redis Cloud from AWS Marketplace billing."

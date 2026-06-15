@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis CRDB Credential Sync"
+  short_description: "Fix CRDB credential mismatch errors"
+  default_prompt: "Use $redis-crdb-credential-sync to troubleshoot CRDB inter-cluster authentication after a credential change."

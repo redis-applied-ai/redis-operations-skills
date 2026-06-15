@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Node Memory Increase"
+  short_description: "Increase Redis node memory safely"
+  default_prompt: "Use $redis-software-node-memory-increase to plan or troubleshoot Redis Software node memory increases."

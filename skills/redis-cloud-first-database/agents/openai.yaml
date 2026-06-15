@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud First Database"
+  short_description: "Choose a plan and create a first DB"
+  default_prompt: "Use $redis-cloud-first-database to help choose a Redis Cloud plan and create a first database."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Database Connection Methods"
+  short_description: "Choose Redis database connection paths"
+  default_prompt: "Use $redis-database-connection-methods to choose the right way to connect to a Redis database."

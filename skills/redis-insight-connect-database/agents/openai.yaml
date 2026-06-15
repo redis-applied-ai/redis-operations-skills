@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Insight Connect Database"
+  short_description: "Connect Redis Insight to Redis databases"
+  default_prompt: "Use $redis-insight-connect-database to troubleshoot a Redis Insight database connection."

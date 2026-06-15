@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Delete Database"
+  short_description: "Delete Redis Cloud databases safely"
+  default_prompt: "Use $redis-cloud-delete-database to guide safe Redis Cloud database deletion and billing cleanup."

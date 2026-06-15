@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Host Port"
+  short_description: "Find Redis Software endpoints"
+  default_prompt: "Use $redis-software-host-port to find and validate a Redis Software database host and port."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis OSS Cluster Flush"
+  short_description: "Flush all Redis Cluster masters"
+  default_prompt: "Use $redis-oss-cluster-flush-all-keys to safely remove keys from a Redis OSS Cluster."

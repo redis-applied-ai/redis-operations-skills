@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Insight Data Management"
+  short_description: "Explore and manage Redis data"
+  default_prompt: "Use $redis-insight-data-management to inspect, troubleshoot, or manage Redis data with Redis Insight."

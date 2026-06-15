@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Data Migration"
+  short_description: "Choose Redis migration methods"
+  default_prompt: "Use $redis-data-migration-options to select and plan a Redis data migration method."

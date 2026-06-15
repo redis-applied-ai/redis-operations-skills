@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud High Network"
+  short_description: "Respond to network usage alerts"
+  default_prompt: "Use $redis-cloud-high-network-warning to triage Redis Cloud High Network Usage warnings."

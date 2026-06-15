@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Connect Database"
+  short_description: "Connect to Redis Cloud databases"
+  default_prompt: "Use $redis-cloud-connect-database to troubleshoot a Redis Cloud database connection."

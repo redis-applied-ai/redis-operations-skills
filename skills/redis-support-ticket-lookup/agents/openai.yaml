@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Support Ticket Lookup"
+  short_description: "Find Redis Support tickets"
+  default_prompt: "Use $redis-support-ticket-lookup to help locate or reply to an existing Redis Support ticket."

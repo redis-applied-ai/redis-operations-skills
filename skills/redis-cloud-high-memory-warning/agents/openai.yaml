@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud High Memory"
+  short_description: "Respond to Redis Cloud memory alerts"
+  default_prompt: "Use $redis-cloud-high-memory-warning to triage Redis Cloud high memory usage warnings."

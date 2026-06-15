@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis JSON Null Indexing"
+  short_description: "Query null JSON fields"
+  default_prompt: "Use $redis-json-null-indexing to design or troubleshoot Redis Search queries for JSON null or missing fields."

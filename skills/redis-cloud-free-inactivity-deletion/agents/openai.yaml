@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Free Inactivity Deletion"
+  short_description: "Explain Free database deletion"
+  default_prompt: "Use $redis-cloud-free-inactivity-deletion to explain or triage Redis Cloud Free database inactivity deletion."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud GCP Marketplace"
+  short_description: "Map Redis Cloud to GCP Marketplace"
+  default_prompt: "Use $redis-cloud-gcp-marketplace to connect or troubleshoot Redis Cloud billing through Google Cloud Marketplace."

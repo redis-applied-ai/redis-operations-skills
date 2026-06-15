@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Delete Account"
+  short_description: "Prepare Redis Cloud account closure"
+  default_prompt: "Use $redis-cloud-delete-account to guide Redis Cloud account deletion and privacy erasure readiness."

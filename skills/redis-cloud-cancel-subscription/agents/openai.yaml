@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Cancel Subscription"
+  short_description: "Safely cancel Redis Cloud subscriptions"
+  default_prompt: "Use $redis-cloud-cancel-subscription to guide a safe Redis Cloud subscription cancellation."

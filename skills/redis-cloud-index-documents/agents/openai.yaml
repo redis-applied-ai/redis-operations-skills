@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Index Documents"
+  short_description: "Index JSON and hash documents in Redis Cloud"
+  default_prompt: "Use $redis-cloud-index-documents to troubleshoot documents missing from a Redis Cloud Search and Query index."

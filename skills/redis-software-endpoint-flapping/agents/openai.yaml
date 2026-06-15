@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Endpoint Flapping"
+  short_description: "Diagnose Redis endpoint churn"
+  default_prompt: "Use $redis-software-endpoint-flapping to diagnose Redis Software endpoint flapping and intermittent DNS connectivity."

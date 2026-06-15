@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Data Import"
+  short_description: "Import Redis data safely"
+  default_prompt: "Use $redis-data-import to plan, execute, or troubleshoot Redis data imports."

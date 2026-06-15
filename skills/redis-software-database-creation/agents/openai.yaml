@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Database Creation"
+  short_description: "Plan Redis Software database settings"
+  default_prompt: "Use $redis-software-database-creation to plan Redis Software database creation and configuration."

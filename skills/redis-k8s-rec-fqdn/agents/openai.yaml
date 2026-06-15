@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis K8s REC FQDN"
+  short_description: "Find Redis Enterprise K8s FQDNs"
+  default_prompt: "Use $redis-k8s-rec-fqdn to determine and validate a Redis Enterprise Cluster FQDN in Kubernetes."

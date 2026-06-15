@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Kubernetes REC License"
+  short_description: "Apply and troubleshoot REC licenses"
+  default_prompt: "Use $redis-k8s-rec-license to apply or troubleshoot a Redis Enterprise Cluster license in Kubernetes."

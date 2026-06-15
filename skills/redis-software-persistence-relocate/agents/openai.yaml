@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Persistence Relocate"
+  short_description: "Move Redis Software persistence storage"
+  default_prompt: "Use $redis-software-persistence-relocate to plan or troubleshoot moving Redis Software persistence to a new mount."

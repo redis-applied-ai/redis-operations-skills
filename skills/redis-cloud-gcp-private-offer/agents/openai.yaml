@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud GCP Private Offer"
+  short_description: "Activate Redis Cloud GCP private offers"
+  default_prompt: "Use $redis-cloud-gcp-private-offer to troubleshoot a Redis Cloud Google Cloud Marketplace private-offer activation."

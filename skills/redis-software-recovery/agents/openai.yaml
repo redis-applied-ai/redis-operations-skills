@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Recovery"
+  short_description: "Recover Redis clusters and databases"
+  default_prompt: "Use $redis-software-recovery to plan recovery for a failed Redis Software cluster or database."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Billing Permissions"
+  short_description: "Verify Redis Cloud billing access"
+  default_prompt: "Use $redis-cloud-billing-permissions to verify Redis Cloud subscription ownership and billing permissions."

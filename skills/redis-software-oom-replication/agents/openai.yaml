@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis OOM Replication"
+  short_description: "Reduce OOM data-loss risk"
+  default_prompt: "Use $redis-software-oom-replication to assess and reduce Redis Software OOM-related data-loss risk."

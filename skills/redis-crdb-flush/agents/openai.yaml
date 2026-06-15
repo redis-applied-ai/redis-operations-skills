@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis CRDB Flush"
+  short_description: "Safely flush Active-Active CRDB"
+  default_prompt: "Use $redis-crdb-flush to safely plan, execute, or troubleshoot a Redis Software CRDB flush."

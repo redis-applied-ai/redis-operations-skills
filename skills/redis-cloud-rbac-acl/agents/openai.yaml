@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud RBAC ACL"
+  short_description: "Design and debug Redis Cloud access rules"
+  default_prompt: "Use $redis-cloud-rbac-acl to design or troubleshoot Redis Cloud ACL and RBAC permissions."

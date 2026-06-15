@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Credential Rotation"
+  short_description: "Rotate Redis Software credentials and certs"
+  default_prompt: "Use $redis-software-credential-certificate-rotation to plan or troubleshoot Redis Software credential and certificate rotation."

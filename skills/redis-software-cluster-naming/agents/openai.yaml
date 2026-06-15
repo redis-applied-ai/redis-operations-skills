@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Cluster Naming"
+  short_description: "Choose safe Redis cluster names"
+  default_prompt: "Use $redis-software-cluster-naming to validate a Redis Software cluster name before deployment."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Throughput Spike Triage"
+  short_description: "Handle Redis traffic spikes"
+  default_prompt: "Use $redis-throughput-spike-triage to stabilize and size Redis traffic spikes above configured Ops/Sec."

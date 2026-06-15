@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software RHEL Firewall DNS"
+  short_description: "Fix Redis node reachability on RHEL"
+  default_prompt: "Use $redis-software-rhel-firewall-dns to diagnose Redis Software UNREACHABLE nodes after RHEL installation."

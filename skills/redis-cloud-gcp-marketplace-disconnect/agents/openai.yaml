@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis GCP Marketplace Disconnect"
+  short_description: "Disconnect GCP Marketplace billing"
+  default_prompt: "Use $redis-cloud-gcp-marketplace-disconnect to safely disconnect Redis Cloud from Google Cloud Marketplace billing."

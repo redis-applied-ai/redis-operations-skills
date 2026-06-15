@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis CRDB Delete Latency"
+  short_description: "Reduce CRDB delete latency"
+  default_prompt: "Use $redis-crdb-delete-latency to diagnose latency caused by DEL or UNLINK in Active-Active CRDB."

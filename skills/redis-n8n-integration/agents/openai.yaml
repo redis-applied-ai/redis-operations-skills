@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis n8n Integration"
+  short_description: "Connect n8n workflows to Redis"
+  default_prompt: "Use $redis-n8n-integration to configure or troubleshoot n8n workflows using Redis."

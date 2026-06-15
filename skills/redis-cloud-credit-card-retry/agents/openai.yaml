@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Card Retry"
+  short_description: "Troubleshoot failed card payments"
+  default_prompt: "Use $redis-cloud-credit-card-retry to troubleshoot Redis Cloud credit card payment retry behavior."

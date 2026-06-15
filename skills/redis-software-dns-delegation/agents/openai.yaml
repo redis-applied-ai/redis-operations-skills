@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software DNS"
+  short_description: "Configure Redis Software DNS delegation"
+  default_prompt: "Use $redis-software-dns-delegation to plan or troubleshoot Redis Software DNS delegation."

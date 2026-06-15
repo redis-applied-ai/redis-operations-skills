@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis CRDB Zero Memory"
+  short_description: "Fix CRDB instances showing 0 memory"
+  default_prompt: "Use $redis-crdb-zero-memory to diagnose a CRDB instance that shows 0 memory after creation."

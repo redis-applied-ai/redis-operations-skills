@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis K8s Stale Info"
+  short_description: "Triage REDB stale info states"
+  default_prompt: "Use $redis-k8s-stale-info-active-change to troubleshoot stale shard info and Active Change pending after Kubernetes apply."

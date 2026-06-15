@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Search Cluster Compatibility"
+  short_description: "Check FT.SEARCH cluster support"
+  default_prompt: "Use $redis-search-oss-cluster-compatibility to decide whether FT.SEARCH can run with OSS Cluster API enabled."

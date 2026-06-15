@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud VPC Peering"
+  short_description: "Set up Redis Cloud private VPC access"
+  default_prompt: "Use $redis-cloud-vpc-peering to troubleshoot Redis Cloud Pro VPC peering and private endpoint routing."

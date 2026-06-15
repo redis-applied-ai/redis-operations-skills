@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis OSS Cluster API"
+  short_description: "Enable Redis OSS Cluster API"
+  default_prompt: "Use $redis-oss-cluster-api to decide, enable, or troubleshoot OSS Cluster API for Redis."

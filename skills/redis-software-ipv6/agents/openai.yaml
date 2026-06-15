@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software IPv6"
+  short_description: "Configure Redis Software IPv6"
+  default_prompt: "Use $redis-software-ipv6 to plan or troubleshoot IPv6 in Redis Software or Redis Enterprise for Kubernetes."

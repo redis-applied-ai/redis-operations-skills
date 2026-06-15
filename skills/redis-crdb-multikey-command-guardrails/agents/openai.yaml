@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis CRDB Command Guardrails"
+  short_description: "Prevent unsupported CRDB commands"
+  default_prompt: "Use $redis-crdb-multikey-command-guardrails to detect and remediate unsupported multi-key commands in Active-Active CRDB."

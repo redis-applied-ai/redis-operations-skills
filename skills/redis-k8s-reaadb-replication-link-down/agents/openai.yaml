@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis K8s REAADB Link Down"
+  short_description: "Triage Active-Active replication"
+  default_prompt: "Use $redis-k8s-reaadb-replication-link-down to troubleshoot Redis Enterprise Active-Active replication link down in Kubernetes."

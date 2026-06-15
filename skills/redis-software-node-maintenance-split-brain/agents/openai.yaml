@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Node Maintenance Safety"
+  short_description: "Avoid split-brain during maintenance"
+  default_prompt: "Use $redis-software-node-maintenance-split-brain to plan safe Redis Software node maintenance."

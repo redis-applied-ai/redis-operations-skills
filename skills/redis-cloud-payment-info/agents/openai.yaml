@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Payment Info"
+  short_description: "Find invoices and payment links"
+  default_prompt: "Use $redis-cloud-payment-info to help find Redis Cloud invoices, payment links, or payment instructions."

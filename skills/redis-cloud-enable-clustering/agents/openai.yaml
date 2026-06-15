@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Clustering"
+  short_description: "Enable Redis Cloud clustering safely"
+  default_prompt: "Use $redis-cloud-enable-clustering to plan or troubleshoot Redis Cloud database clustering."

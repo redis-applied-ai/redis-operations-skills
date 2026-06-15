@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Invoice Lookup"
+  short_description: "Find and troubleshoot Redis Cloud invoices"
+  default_prompt: "Use $redis-cloud-invoice-lookup to help find or troubleshoot a Redis Cloud invoice or payment link."

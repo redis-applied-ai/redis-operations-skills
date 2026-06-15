@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Billing Triage"
+  short_description: "Route Redis Cloud billing issues"
+  default_prompt: "Use $redis-cloud-billing-triage to classify and route a Redis Cloud billing question."

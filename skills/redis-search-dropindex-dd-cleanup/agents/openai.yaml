@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis DROPINDEX Cleanup"
+  short_description: "Clean up FT.DROPINDEX leftovers"
+  default_prompt: "Use $redis-search-dropindex-dd-cleanup to troubleshoot leftover documents after FT.DROPINDEX DD."

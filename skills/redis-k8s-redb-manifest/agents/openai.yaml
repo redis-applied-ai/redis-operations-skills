@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Kubernetes REDB Manifest"
+  short_description: "Create and debug REDB YAML manifests"
+  default_prompt: "Use $redis-k8s-redb-manifest to create or review a Redis Enterprise Database YAML manifest."

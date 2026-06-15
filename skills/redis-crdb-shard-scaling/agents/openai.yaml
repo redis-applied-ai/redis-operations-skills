@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis CRDB Shard Scaling"
+  short_description: "Scale Active-Active shards safely"
+  default_prompt: "Use $redis-crdb-shard-scaling to plan or troubleshoot Redis Software Active-Active shard scaling."

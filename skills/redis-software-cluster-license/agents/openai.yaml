@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Cluster License"
+  short_description: "Apply and troubleshoot RS licenses"
+  default_prompt: "Use $redis-software-cluster-license to troubleshoot a Redis Software license or FQDN mismatch."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Socket Location"
+  short_description: "Plan Redis Software socket paths"
+  default_prompt: "Use $redis-software-socket-location to troubleshoot or plan Redis Software socket file location changes."

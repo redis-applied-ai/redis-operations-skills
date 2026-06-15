@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Cloud Change Account Email"
+  short_description: "Migrate Redis Cloud access to a new email"
+  default_prompt: "Use $redis-cloud-change-account-email to safely move Redis Cloud account access to a new email address."

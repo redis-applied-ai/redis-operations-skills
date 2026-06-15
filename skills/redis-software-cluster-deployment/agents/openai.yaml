@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Software Cluster Deployment"
+  short_description: "Deploy Redis Software clusters"
+  default_prompt: "Use $redis-software-cluster-deployment to create and validate a Redis Software cluster."

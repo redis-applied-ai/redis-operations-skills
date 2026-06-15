@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redis Insight Onboarding"
+  short_description: "Set up Redis Insight first use"
+  default_prompt: "Use $redis-insight-onboarding to help a user launch Redis Insight and add their first database."

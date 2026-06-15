@@ -1,0 +1,40 @@
+apiVersion: app.redislabs.com/v1alpha1
+kind: RedisEnterpriseDatabase
+metadata:
+  name: <database-resource-name>
+  namespace: <namespace>
+spec:
+  type: redis
+  version: "<redis-version>"
+  defaultUser: true
+  databaseSecretName: <database-password-secret>
+  resp3: true
+  redisEnterpriseCluster:
+    name: <rec-name>
+
+  memorySize: "<memory-size>"
+  shardCount: <shard-count>
+  replication: true
+  persistence: "aofEverySecond"
+  evictionPolicy: "volatile-lru"
+
+  # Optional auto-tiering / Redis on Flash.
+  # isRof: true
+  # rofRamSize: "<ram-size>"
+
+  # Optional backups.
+  # backup:
+  #   s3:
+  #     awsSecretName: <aws-secret-name>
+  #     bucketName: <bucket-name>
+  #     subdir: <backup-path>
+
+  # Optional TLS.
+  # tlsMode: "enabled"
+  # tlsSecret: <tls-secret-name>
+
+  # Optional metadata.
+  # databaseName: "<database-display-name>"
+  # labels:
+  #   workload: "<workload>"
+  #   env: "<environment>"
