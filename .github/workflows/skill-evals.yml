@@ -1,0 +1,126 @@
+name: Skill evals
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/skill-evals.yml"
+      - "evals/**"
+      - "scripts/validate-skills.sh"
+      - "skills/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/skill-evals.yml"
+      - "evals/**"
+      - "scripts/validate-skills.sh"
+      - "skills/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skill-evals-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fixture-evals:
+    name: Fixture evals
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: python -m pip install --upgrade uv
+
+      - name: Validate skills
+        run: ./scripts/validate-skills.sh
+
+      - name: Validate eval fixtures
+        run: uv run --with pydantic --with pyyaml python evals/run_skill_evals.py --dry-run
+
+      - name: Run fixture eval matrix
+        run: uv run --with pydantic --with pyyaml python evals/run_skill_evals.py --provider fixture --variant both --repetitions 5
+
+      - name: Compile eval harness
+        run: >-
+          PYTHONDONTWRITEBYTECODE=1 uv run --with pydantic --with pyyaml python -m py_compile
+          evals/run_skill_evals.py
+          evals/agent_harness.py
+          evals/graders.py
+          evals/operator_sim.py
+          evals/schemas.py
+          evals/world.py
+
+      - name: Upload fixture artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fixture-skill-eval-artifacts
+          path: evals/artifacts/
+          if-no-files-found: ignore
+
+  live-openai-eval:
+    name: Live OpenAI eval
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs:
+      - fixture-evals
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_EVAL_MODEL: ${{ vars.OPENAI_EVAL_MODEL || secrets.OPENAI_EVAL_MODEL }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: python -m pip install --upgrade uv
+
+      - name: Require live OpenAI configuration
+        run: |
+          test -n "$OPENAI_API_KEY" || {
+            echo "OPENAI_API_KEY GitHub secret is required for live evals." >&2
+            exit 1
+          }
+          test -n "$OPENAI_EVAL_MODEL" || {
+            echo "OPENAI_EVAL_MODEL GitHub variable or secret is required for live evals." >&2
+            exit 1
+          }
+
+      - name: Check Agents SDK import path
+        run: >-
+          PYTHONDONTWRITEBYTECODE=1 uv run --with openai-agents python
+          -c 'from agents import Agent, Runner; Agent(name="empty-instructions-check", instructions="", model="test-model"); print("agents-sdk-ok")'
+
+      - name: Run live OpenAI eval smoke test
+        run: >-
+          uv run --with openai --with openai-agents --with pydantic --with pyyaml
+          python evals/run_skill_evals.py
+          --provider openai
+          --scenario cloud-delete-button-missing-role
+          --variant both
+          --repetitions 1
+
+      - name: Upload live artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-openai-skill-eval-artifacts
+          path: evals/artifacts/
+          if-no-files-found: ignore
