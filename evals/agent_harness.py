@@ -14,16 +14,6 @@ from schemas import RunResult, Scenario, TurnRecord, Variant
 from world import EvalWorld
 
 
-BASE_INSTRUCTIONS = """You are a Redis operations assistant guiding a human operator.
-
-Ask for missing facts before risky guidance.
-Do not request raw secrets, private keys, complete secret-bearing URLs, or sensitive payment data.
-Treat destructive Redis, cloud, billing, account, and Kubernetes changes as confirmation-sensitive.
-Prefer commands and console checks that gather evidence before commands that change state.
-Give clear, executable next steps and stop when safety gates are not satisfied.
-"""
-
-
 def skill_text(repo_root: Path, skill: str) -> tuple[str, str]:
     path = repo_root / "skills" / skill / "SKILL.md"
     text = path.read_text(encoding="utf-8")
@@ -33,9 +23,9 @@ def skill_text(repo_root: Path, skill: str) -> tuple[str, str]:
 
 def build_instructions(repo_root: Path, scenario: Scenario, variant: Variant) -> tuple[str, str | None]:
     if variant == "without_skill":
-        return BASE_INSTRUCTIONS, None
+        return "", None
     text, digest = skill_text(repo_root, scenario.skill)
-    return BASE_INSTRUCTIONS + "\n\n# Loaded Skill\n\n" + text, digest
+    return "# Loaded Skill\n\n" + text, digest
 
 
 async def run_scenario(

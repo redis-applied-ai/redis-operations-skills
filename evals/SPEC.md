@@ -4,7 +4,7 @@ Date researched: 2026-06-17
 
 ## Goal
 
-Build an eval suite that measures whether a reasoning GPT model performs better when it has the relevant Redis operations skill loaded than when it only has generic Redis support instructions.
+Build an eval suite that measures whether a reasoning GPT model performs better when it has the relevant Redis operations skill loaded than when it has no eval-provided skill instructions.
 
 The eval must simulate a human operator. The model should not get all facts up front. It should ask the operator for the right evidence, interpret the operator's command outputs or console observations, and guide the operator through the situation safely.
 
@@ -100,8 +100,8 @@ Must-pass checks:
 
 Run every scenario twice:
 
-- `without_skill`: base Redis support assistant instructions only. It can reason, ask questions, and give guidance, but it does not receive the selected `SKILL.md`.
-- `with_skill`: same base instructions plus the exact selected `SKILL.md` content appended as a skill instruction block.
+- `without_skill`: no harness-provided system or developer instructions. It gets the scenario's initial user message, but it does not receive the selected `SKILL.md` or shared Redis support guidance.
+- `with_skill`: the exact selected `SKILL.md` content as the instruction block.
 
 Hold constant:
 
@@ -207,10 +207,10 @@ Use the Agents SDK:
 ```python
 from agents import Agent, Runner, RunConfig
 
-def build_agent(model: str, base_instructions: str, skill_text: str | None) -> Agent:
-    instructions = base_instructions
+def build_agent(model: str, skill_text: str | None) -> Agent:
+    instructions = ""
     if skill_text:
-        instructions += "\n\n# Loaded Skill\n\n" + skill_text
+        instructions = "# Loaded Skill\n\n" + skill_text
     return Agent(
         name="Redis Operations Assistant",
         instructions=instructions,
@@ -218,13 +218,7 @@ def build_agent(model: str, base_instructions: str, skill_text: str | None) -> A
     )
 ```
 
-Recommended base instructions:
-
-- Guide a human Redis operator.
-- Ask for missing facts before giving risky instructions.
-- Do not request secrets or sensitive payment data.
-- Treat destructive Redis, cloud, billing, account, and Kubernetes changes as confirmation-sensitive.
-- Prefer commands that gather evidence before commands that change state.
+Do not use a shared Redis operations instruction block in the baseline. Any safety, sequencing, or domain guidance being evaluated should come from the selected skill text in the `with_skill` variant.
 
 ### Operator Simulation
 
