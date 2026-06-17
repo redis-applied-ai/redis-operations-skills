@@ -43,6 +43,9 @@ jobs:
       - name: Validate eval fixtures
         run: uv run --with pydantic --with pyyaml python evals/run_skill_evals.py --dry-run
 
+      - name: Run eval unit tests
+        run: uv run --with pytest --with pydantic --with pyyaml pytest evals/tests
+
       - name: Run fixture eval matrix
         run: uv run --with pydantic --with pyyaml python evals/run_skill_evals.py --provider fixture --variant both --repetitions 5
 

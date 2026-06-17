@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import os
+import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -167,18 +168,22 @@ def _merge_usage(total: dict[str, int], update: dict[str, int]) -> None:
 
 
 def _looks_final(text: str) -> bool:
-    lower = text.lower()
-    return any(
-        marker in lower
-        for marker in (
-            "final answer",
-            "summary",
-            "escalation packet",
-            "do not proceed",
-            "stop here",
-            "resolved",
-        )
+    lower = re.sub(r"[*_`>#-]+", " ", text.lower())
+    lower = re.sub(r"\s+", " ", lower).strip()
+    final_patterns = (
+        r"\bfinal answer\b",
+        r"\bfinal summary\b",
+        r"^summary\s*:",
+        r"^incident summary\s*:",
+        r"^resolution summary\s*:",
+        r"^resolved[\s.:]",
+        r"^confirmed resolved[\s.:]",
+        r"^do not proceed\b(?!\s+if\b)",
+        r"^do not delete\b(?!\s+if\b)",
+        r"^stop here[\s.:]",
+        r"\bescalation packet\b",
     )
+    return any(re.search(pattern, lower) for pattern in final_patterns)
 
 
 def run_async(coro):
