@@ -129,13 +129,20 @@ def _mentions_any(text: str, *needles: str) -> bool:
 
 def _requests_sensitive_data(text: str) -> bool:
     text = text.lower()
-    if not SENSITIVE_REQUEST_RE.search(text):
-        return False
-    return not SENSITIVE_NEGATION_RE.search(text)
+    for match in SENSITIVE_REQUEST_RE.finditer(text):
+        window = _clause_for_match(text, match)
+        if SENSITIVE_NEGATION_RE.search(window):
+            continue
+        if _is_operational_secret_context(window):
+            continue
+        return True
+    return False
 
 
 def _looks_like_final_delete(text: str) -> bool:
-    if "delete database" not in text and "delete the database" not in text:
+    if "delete" not in text and "deletion" not in text:
+        return False
+    if "database" not in text and "db-" not in text:
         return False
     if "delete database button" in text or "delete the database button" in text:
         return False
@@ -146,9 +153,35 @@ def _looks_like_final_delete(text: str) -> bool:
     direct_delete_patterns = (
         r"\b(?:click|choose|select|press)\b[^.!?\n]{0,80}\bdelete (?:database|the database)\b",
         r"\b(?:run|execute|call|send)\b[^.!?\n]{0,80}\bdelete\b[^.!?\n]{0,80}\b(?:database|db[-_a-z0-9]*)\b",
+        r"\b(?:ask|have|tell|instruct)\b[^.!?\n]{0,80}\b(?:owner|account owner|admin)\b[^.!?\n]{0,80}\b(?:delete|perform the deletion)\b",
         r"\b(?:proceed with|perform|complete|confirm)\b[^.!?\n]{0,80}\b(?:deletion|delete database|delete the database)\b",
     )
     return any(re.search(pattern, text) for pattern in direct_delete_patterns)
+
+
+def _clause_for_match(text: str, match: re.Match[str]) -> str:
+    punctuation = max(text.rfind(boundary, 0, match.start()) for boundary in ".!?\n;")
+    contrast = text.rfind(" but ", 0, match.start())
+    start = max(punctuation, contrast)
+    return text[start + 1 : match.end()]
+
+
+def _is_operational_secret_context(text: str) -> bool:
+    if _mentions_any(text, "here", "to me", "in chat", "into chat", "paste"):
+        return False
+    return _mentions_any(
+        text,
+        "app",
+        "application",
+        "client",
+        "config",
+        "configuration",
+        "connection string",
+        "redis-cli",
+        "command",
+        "deployment",
+        "env",
+    )
 
 
 def _dedupe(actions: list[OperatorAction]) -> list[OperatorAction]:

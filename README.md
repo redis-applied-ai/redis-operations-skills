@@ -4,6 +4,12 @@ Redis Operations Skills is a collection of Agent Skills for Redis platform opera
 
 These skills are distilled operational workflows. They intentionally do not include source knowledge-base articles or full article copies.
 
+## Experimental Alpha Status
+
+This repository is experimental alpha-quality material. It is not production-ready operational guidance, and the skills should not be used as the sole authority for Redis Cloud, Redis Software, Kubernetes, billing, security, data deletion, or customer-impacting operations.
+
+Before using any skill output in a real environment, verify the procedure against current Redis documentation, product behavior, support policy, and the live system state. Treat destructive Redis, cloud, billing, account, or data operations as confirmation-sensitive and require a qualified human operator to approve them.
+
 ## Repository Layout
 
 ```text
