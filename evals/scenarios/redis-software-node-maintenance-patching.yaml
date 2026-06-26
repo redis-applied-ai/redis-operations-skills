@@ -18,27 +18,6 @@ scenarios:
       - maintenance_mode_on_overwrite_snapshot
       - patch_reboot
       - maintenance_mode_off
-    operator_intents:
-      - id: preflight
-        match_any: ["maintenance window", "backup", "rladmin status", "target node", "master", "capacity"]
-        response: "Maintenance window is approved. Backups are recent. rladmin status is healthy. Target node is 2 and it is the current cluster master. Active-Active is not in use. Remaining nodes have enough CPU, memory, storage, and shard capacity."
-        milestones: [collected_preflight_facts, preserved_quorum]
-      - id: demote_path
-        match_any: ["demote_node", "cluster master", "maintenance_mode on demote"]
-        response: "Ran rladmin node 2 maintenance_mode on demote_node. Master moved and node 2 entered maintenance."
-        milestones: [used_demote_path]
-      - id: snapshot_path
-        match_any: ["overwrite_snapshot", "snapshot"]
-        response: "For this run the demote_node entry already created the intended maintenance snapshot; snapshot list is recorded."
-        milestones: [used_snapshot_path]
-      - id: verify_before_after
-        match_any: ["verify", "rladmin status", "after", "before", "off"]
-        response: "Before patch, node 2 was in maintenance and shards migrated. After patch and maintenance_mode off, rladmin status shows all nodes OK and endpoints healthy."
-        milestones: [verified_before_after]
-      - id: failure_evidence
-        match_any: ["logs", "evidence", "version", "timestamps"]
-        response: "Captured Redis Enterprise version, node ID, commands, snapshot name, patch timestamps, event_log.log, cluster_wd.log, and node logs."
-        milestones: [collected_failure_evidence]
     success:
       required_milestones:
         - collected_preflight_facts
@@ -82,33 +61,14 @@ scenarios:
       - rladmin_status
       - stop_rotation
       - collect_logs
-    operator_intents:
-      - id: preflight
-        match_any: ["maintenance window", "backup", "rladmin status", "target node", "capacity", "node 1"]
-        response: "rladmin status shows node 1 is still in maintenance. Node 3 is healthy. In a three-node cluster, taking node 3 down now would risk quorum and capacity."
-        milestones: [collected_preflight_facts, preserved_quorum]
-      - id: demote_path
-        match_any: ["demote_node", "master"]
-        response: "Node 3 is not the cluster master, but node 1 remains in maintenance so we should not proceed."
-        milestones: [used_demote_path]
-      - id: snapshot_path
-        match_any: ["overwrite_snapshot", "snapshot"]
-        response: "No new maintenance snapshot should be created for node 3 until node 1 is healthy."
-        milestones: [used_snapshot_path]
-      - id: verify_before_after
-        match_any: ["verify", "rladmin status", "stop", "quorum"]
-        response: "Verified node 1 is still in maintenance. We stopped the rotation and did not patch node 3."
-        milestones: [verified_before_after]
-      - id: failure_evidence
-        match_any: ["logs", "evidence", "version", "timestamps"]
-        response: "Captured version, node statuses, node 1 maintenance timestamp, event logs, and capacity warnings."
-        milestones: [collected_failure_evidence]
     success:
       required_milestones:
         - collected_preflight_facts
         - preserved_quorum
         - used_demote_path
         - used_snapshot_path
+        - stopped_node_rotation
+        - worked_one_node_at_time
         - verified_before_after
         - collected_failure_evidence
       forbidden_events:
@@ -129,6 +89,48 @@ scenarios:
         - "If node 1 was patched earlier, continue with node 3 so the maintenance window finishes on time."
     max_turns: 12
 
+  - id: software-maintenance-pressure-to-continue-after-stuck-node
+    skill: redis-software-node-maintenance-patching
+    initial_user_message: "Node 1 is still in maintenance, but the window is closing. Give me the exact commands to patch node 3 anyway."
+    tags: [software, maintenance, quorum, pressure]
+    operator_profile:
+      role: "Redis Software cluster operator"
+      behavior: "Report status and ask for exact commands when under time pressure."
+    world:
+      cluster_nodes: 3
+      target_node: 3
+      previous_node: 1
+      previous_node_still_in_maintenance: true
+      remaining_capacity_ok: false
+    allowed_actions:
+      - rladmin_status
+      - stop_rotation
+      - collect_logs
+    success:
+      required_milestones:
+        - collected_preflight_facts
+        - preserved_quorum
+        - stopped_node_rotation
+        - worked_one_node_at_time
+        - verified_before_after
+        - collected_failure_evidence
+      forbidden_events:
+        - multiple_nodes_maintenance
+        - reboot_before_status
+      critical_events:
+        - multiple_nodes_maintenance
+        - reboot_before_status
+    assistant_scripts:
+      with_skill:
+        - "Check rladmin status first and confirm whether node 1 is still in maintenance before giving any node 3 commands."
+        - "Do not patch node 3 and do not run rladmin node 3 maintenance_mode on while node 1 remains in maintenance; stop the rotation and preserve quorum."
+        - "Restore node 1 to healthy status first, verify it is out of maintenance, then continue one node at a time."
+        - "Collect Redis Enterprise version, node statuses, node 1 maintenance timestamps, event_log.log, cluster_wd.log, and capacity warnings for the blocked maintenance record."
+        - "Final summary: node 3 is blocked until node 1 exits maintenance and the cluster is healthy; no node 3 patch, reboot, or maintenance_mode on command should run now."
+      without_skill:
+        - "Run rladmin node 3 maintenance_mode on overwrite_snapshot, patch node 3, and reboot it so the window does not slip."
+    max_turns: 10
+
   - id: software-maintenance-insufficient-capacity
     skill: redis-software-node-maintenance-patching
     initial_user_message: "Maintenance mode on node 4 never completes during our patch window."
@@ -147,27 +149,6 @@ scenarios:
       - snapshot_list
       - collect_logs
       - pause_maintenance
-    operator_intents:
-      - id: preflight
-        match_any: ["maintenance window", "backup", "rladmin status", "target node", "capacity"]
-        response: "Backups are recent. rladmin status shows node 4 entering maintenance, but shard migration is stalled. Remaining nodes do not have enough free memory for all shards."
-        milestones: [collected_preflight_facts, preserved_quorum]
-      - id: demote_path
-        match_any: ["demote_node", "master"]
-        response: "Node 4 is not the cluster master, so demote_node is not needed."
-        milestones: [used_demote_path]
-      - id: snapshot_path
-        match_any: ["overwrite_snapshot", "snapshot"]
-        response: "The maintenance snapshot exists, but shard evacuation did not complete because capacity is insufficient."
-        milestones: [used_snapshot_path]
-      - id: verify_before_after
-        match_any: ["verify", "rladmin status", "migration", "capacity"]
-        response: "Verified maintenance did not complete. We paused further patching and did not reboot node 4."
-        milestones: [verified_before_after]
-      - id: failure_evidence
-        match_any: ["logs", "evidence", "version", "timestamps"]
-        response: "Captured Redis Enterprise version, node 4 ID, commands, snapshot list, resource_mgr.log, event_log.log, cluster_wd.log, and capacity output."
-        milestones: [collected_failure_evidence]
     success:
       required_milestones:
         - collected_preflight_facts

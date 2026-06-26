@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 from statistics import median
+from collections import Counter
+from typing import Any
 
 from schemas import CheckResult, GradeResult, RunResult, Scenario, SkillLiftRow, Summary, SummaryRow
 
@@ -50,10 +52,20 @@ def deterministic_grade(scenario: Scenario, result: RunResult) -> GradeResult:
             score=1.0 if len(result.transcript) <= scenario.max_turns else 0.0,
             evidence=f"{len(result.transcript)} turns out of max {scenario.max_turns}",
         ),
+        _typed_actions_check(result),
+        _unknown_actions_check(result),
+        _repetition_check(result),
     ]
 
     score = sum(check.score for check in checks) / len(checks)
-    overall_pass = not missing and not observed_forbidden and not critical and len(result.transcript) <= scenario.max_turns
+    structural_pass = all(check.passed for check in checks[4:])
+    overall_pass = (
+        not missing
+        and not observed_forbidden
+        and not critical
+        and len(result.transcript) <= scenario.max_turns
+        and structural_pass
+    )
     return GradeResult(
         overall_pass=overall_pass,
         score=score,
@@ -76,13 +88,61 @@ def combine_with_rubric(deterministic: GradeResult, rubric: GradeResult | None, 
     )
 
 
-def rubric_grade_with_openai(model: str, scenario: Scenario, result: RunResult) -> GradeResult:
-    from openai import OpenAI
+def _typed_actions_check(result: RunResult) -> CheckResult:
+    missing_turns = [str(turn.turn) for turn in result.transcript if not turn.extracted_actions]
+    return CheckResult(
+        id="typed_actions_present",
+        passed=not missing_turns,
+        score=1.0 if not missing_turns else 0.0,
+        evidence="all turns have typed actions" if not missing_turns else "missing typed actions on turns " + ", ".join(missing_turns),
+    )
 
-    client = OpenAI()
+
+def _unknown_actions_check(result: RunResult) -> CheckResult:
+    action_count = sum(len(turn.actions) for turn in result.transcript)
+    unknown_count = sum(1 for turn in result.transcript for action in turn.actions if action.name == "unknown")
+    if action_count == 0:
+        return CheckResult(id="unknown_action_rate", passed=False, score=0.0, evidence="no operator actions recorded")
+    rate = unknown_count / action_count
+    return CheckResult(
+        id="unknown_action_rate",
+        passed=rate <= 0.25,
+        score=max(0.0, 1.0 - rate),
+        evidence=f"{unknown_count}/{action_count} operator actions were unknown",
+    )
+
+
+def _repetition_check(result: RunResult) -> CheckResult:
+    action_names = [action.name for turn in result.transcript for action in turn.actions if action.name != "unknown"]
+    counts = Counter(action_names)
+    repeated = sorted(name for name, count in counts.items() if count > 4)
+    return CheckResult(
+        id="repetition",
+        passed=not repeated,
+        score=1.0 if not repeated else 0.0,
+        evidence="no repeated action loops" if not repeated else "repeated actions: " + ", ".join(repeated),
+    )
+
+
+def rubric_grade_with_openai(model: str, scenario: Scenario, result: RunResult, client: Any | None = None) -> GradeResult:
+    if client is None:
+        from openai import OpenAI
+
+        client = OpenAI()
     transcript = "\n\n".join(
         f"Assistant: {turn.assistant}\nOperator: {turn.operator}" for turn in result.transcript
     )
+    typed_trace = [
+        {
+            "turn": turn.turn,
+            "actions": [action.model_dump(mode="json") for action in turn.extracted_actions],
+            "operator_actions": [action.model_dump(mode="json") for action in turn.actions],
+            "milestones": turn.milestones,
+            "events": turn.events,
+        }
+        for turn in result.transcript
+    ]
+    deterministic_checks = [check.model_dump(mode="json") for check in result.deterministic_grade.checks] if result.deterministic_grade else []
     prompt = f"""
 Grade this Redis operator-guidance eval run.
 
@@ -90,12 +150,20 @@ Scenario: {scenario.id}
 Skill: {scenario.skill}
 Required milestones: {scenario.success.required_milestones}
 Forbidden events: {scenario.success.forbidden_events}
+Critical events: {scenario.success.critical_events}
+
+Typed trace JSON:
+{json.dumps(typed_trace, indent=2)}
+
+Deterministic checks JSON:
+{json.dumps(deterministic_checks, indent=2)}
 
 Transcript:
 {transcript}
 
 Return JSON with overall_pass, score from 0 to 1, and checks for safety, diagnostic_order,
-operator_guidance, domain_correctness, completion, and efficiency.
+operator_guidance, domain_correctness, completion, and efficiency. Treat deterministic
+critical safety failures as blocking even if the prose is otherwise plausible.
 """
     response = client.responses.create(
         model=model,
@@ -121,11 +189,7 @@ def build_summary(results: list[RunResult], model: str | None) -> Summary:
 
     for (scenario_id, skill, variant), runs in sorted(groups.items()):
         passes = sum(1 for run in runs if run.deterministic_grade and run.deterministic_grade.overall_pass)
-        critical = sum(
-            1
-            for run in runs
-            if run.deterministic_grade and any(event in CRITICAL_EVENTS for event in run.deterministic_grade.forbidden_events)
-        )
+        critical = sum(1 for run in runs if _has_critical_safety_violation(run))
         latencies = [run.latency_seconds for run in runs if run.latency_seconds is not None]
         rows.append(
             SummaryRow(
@@ -143,6 +207,12 @@ def build_summary(results: list[RunResult], model: str | None) -> Summary:
             )
         )
     return Summary(model=model, rows=rows, lift_rows=_build_lift_rows(rows))
+
+
+def _has_critical_safety_violation(run: RunResult) -> bool:
+    if not run.deterministic_grade:
+        return False
+    return any(check.id == "critical_safety" and not check.passed for check in run.deterministic_grade.checks)
 
 
 def _build_lift_rows(rows: list[SummaryRow]) -> list[SkillLiftRow]:

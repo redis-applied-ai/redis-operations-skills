@@ -11,6 +11,7 @@ from uuid import uuid4
 
 from graders import combine_with_rubric, deterministic_grade, rubric_grade_with_openai
 from operator_sim import run_operator_turn
+from extractor import OpenAISemanticActionExtractor
 from schemas import RunResult, Scenario, TurnRecord, Variant
 from world import EvalWorld
 
@@ -46,14 +47,29 @@ async def run_scenario(
         skill=scenario.skill,
         variant=variant,
         model=model,
+        scenario_version=scenario.version,
         skill_sha256=digest,
+        model_settings={
+            "assistant_model": model,
+            "rubric_model": rubric_model,
+            "semantic_extractor_provider": "openai",
+            "semantic_extractor_model": os.environ.get("OPENAI_EVAL_EXTRACTOR_MODEL") or model,
+        },
+    )
+    semantic_extractor = OpenAISemanticActionExtractor(
+        model=str(result.model_settings["semantic_extractor_model"]),
     )
     started = time.perf_counter()
 
     for turn_index in range(1, scenario.max_turns + 1):
         assistant_text, usage = await _run_agent_turn(agent, messages)
         _merge_usage(result.token_usage, usage)
-        operator_text, actions = run_operator_turn(assistant_text, scenario, world)
+        operator_text, actions, extracted_actions = run_operator_turn(
+            assistant_text,
+            scenario,
+            world,
+            semantic_extractor=semantic_extractor,
+        )
         messages.append({"role": "assistant", "content": assistant_text})
         messages.append({"role": "user", "content": operator_text})
 
@@ -63,6 +79,7 @@ async def run_scenario(
                 assistant=assistant_text,
                 operator=operator_text,
                 actions=actions,
+                extracted_actions=extracted_actions,
                 events=sorted(world.events),
                 milestones=sorted(world.milestones),
             )
@@ -77,6 +94,7 @@ async def run_scenario(
     result.milestones = sorted(world.milestones)
     result.events = sorted(world.events)
     deterministic = deterministic_grade(scenario, result)
+    result.deterministic_grade = deterministic
     rubric = rubric_grade_with_openai(rubric_model, scenario, result) if rubric_model else None
     result.rubric_grade = rubric
     result.deterministic_grade = combine_with_rubric(
@@ -102,17 +120,24 @@ def run_scripted_scenario(repo_root: Path, scenario: Scenario, variant: Variant)
         skill=scenario.skill,
         variant=variant,
         model="scripted",
+        scenario_version=scenario.version,
         skill_sha256=digest,
+        model_settings={
+            "assistant_model": "scripted",
+            "semantic_extractor_provider": "rule_based",
+            "semantic_extractor_model": None,
+        },
     )
     started = time.perf_counter()
     for turn_index, assistant_text in enumerate(script, start=1):
-        operator_text, actions = run_operator_turn(assistant_text, scenario, world)
+        operator_text, actions, extracted_actions = run_operator_turn(assistant_text, scenario, world)
         result.transcript.append(
             TurnRecord(
                 turn=turn_index,
                 assistant=assistant_text,
                 operator=operator_text,
                 actions=actions,
+                extracted_actions=extracted_actions,
                 events=sorted(world.events),
                 milestones=sorted(world.milestones),
             )
