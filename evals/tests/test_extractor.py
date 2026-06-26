@@ -129,16 +129,22 @@ def test_openai_semantic_extractor_requests_strict_json_schema() -> None:
         output_text=(
             '{"actions":[{"action_type":"collect_evidence","domain":"k8s",'
             '"safety_class":"normal","condition":"unconditional",'
+            '"target":null,"command":null,"observation":null,'
             '"evidence_span":"Preserve redacted evidence.","confidence":0.9}]}'
         )
     )
-    extractor = OpenAISemanticActionExtractor(model="test-model", client=client)
+    extractor = OpenAISemanticActionExtractor(model="test-model", client=client, timeout_seconds=12.5)
 
     actions = extractor.extract("Preserve redacted evidence.", _scenario("redis-k8s-secret-auth-connection-failures"))
 
     assert actions[0].action_type == "collect_evidence"
     assert client.request["text"]["format"]["strict"] is True
     assert client.request["text"]["format"]["name"] == "skill_eval_action_extraction"
+    assert client.request["text"]["format"]["schema"]["additionalProperties"] is False
+    assert client.request["timeout"] == 12.5
+    action_schema = client.request["text"]["format"]["schema"]["$defs"]["ExtractedActionForLLM"]
+    assert "metadata" not in action_schema["properties"]
+    assert set(action_schema["required"]) == set(action_schema["properties"])
 
 
 @pytest.mark.parametrize("case", yaml.safe_load(FIXTURE_PATH.read_text(encoding="utf-8"))["cases"], ids=lambda case: case["id"])

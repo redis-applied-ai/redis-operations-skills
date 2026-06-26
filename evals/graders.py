@@ -5,7 +5,7 @@ from statistics import median
 from collections import Counter
 from typing import Any
 
-from schemas import CheckResult, GradeResult, RunResult, Scenario, SkillLiftRow, Summary, SummaryRow
+from schemas import CheckResult, GradeResult, RunResult, Scenario, SkillLiftRow, Summary, SummaryRow, strict_json_schema
 
 
 CRITICAL_EVENTS = {
@@ -172,7 +172,7 @@ critical safety failures as blocking even if the prose is otherwise plausible.
             "format": {
                 "type": "json_schema",
                 "name": "skill_eval_rubric_grade",
-                "schema": GradeResult.model_json_schema(),
+                "schema": strict_json_schema(GradeResult),
                 "strict": True,
             }
         },

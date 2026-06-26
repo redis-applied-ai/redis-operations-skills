@@ -50,6 +50,22 @@ class ActionExtractionResult(BaseModel):
     actions: list[ExtractedAction] = Field(default_factory=list)
 
 
+class ExtractedActionForLLM(BaseModel):
+    action_type: ActionType
+    domain: ActionDomain = "general"
+    safety_class: SafetyClass = "normal"
+    condition: ActionCondition = "unknown"
+    target: TargetRef | None = None
+    command: str | None = None
+    observation: str | None = None
+    evidence_span: str
+    confidence: float = Field(ge=0.0, le=1.0, default=1.0)
+
+
+class ActionExtractionLLMResult(BaseModel):
+    actions: list[ExtractedActionForLLM] = Field(default_factory=list)
+
+
 class ActionMatch(BaseModel):
     action_type: ActionType | None = None
     domain: ActionDomain | None = None
@@ -181,3 +197,25 @@ class Summary(BaseModel):
     model: str | None
     rows: list[SummaryRow]
     lift_rows: list[SkillLiftRow] = Field(default_factory=list)
+
+
+def strict_json_schema(model: type[BaseModel]) -> dict[str, Any]:
+    schema = model.model_json_schema()
+
+    def visit(node: Any) -> None:
+        if isinstance(node, dict):
+            node.pop("default", None)
+            if node.get("type") == "object" or "properties" in node:
+                node["additionalProperties"] = False
+                if isinstance(node.get("properties"), dict):
+                    node["required"] = list(node["properties"].keys())
+            elif "additionalProperties" in node:
+                node["additionalProperties"] = False
+            for value in node.values():
+                visit(value)
+        elif isinstance(node, list):
+            for item in node:
+                visit(item)
+
+    visit(schema)
+    return schema

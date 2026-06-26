@@ -5,7 +5,7 @@ import re
 from collections.abc import Iterable
 from typing import Any, Protocol
 
-from schemas import ActionCondition, ActionExtractionResult, ExtractedAction, Scenario, TargetRef
+from schemas import ActionCondition, ActionExtractionLLMResult, ExtractedAction, Scenario, TargetRef, strict_json_schema
 
 
 COMMAND_RE = re.compile(
@@ -36,9 +36,19 @@ class SemanticActionExtractor(Protocol):
 
 
 class OpenAISemanticActionExtractor:
-    def __init__(self, model: str, client: Any | None = None):
+    def __init__(
+        self,
+        model: str,
+        client: Any | None = None,
+        timeout_seconds: float | None = None,
+        reasoning_effort: str | None = None,
+        max_output_tokens: int | None = None,
+    ):
         self.model = model
         self.client = client
+        self.timeout_seconds = timeout_seconds
+        self.reasoning_effort = reasoning_effort
+        self.max_output_tokens = max_output_tokens
 
     def extract(self, assistant_text: str, scenario: Scenario) -> list[ExtractedAction]:
         client = self.client
@@ -64,13 +74,17 @@ class OpenAISemanticActionExtractor:
                 "format": {
                     "type": "json_schema",
                     "name": "skill_eval_action_extraction",
-                    "schema": ActionExtractionResult.model_json_schema(),
+                    "schema": strict_json_schema(ActionExtractionLLMResult),
                     "strict": True,
                 }
             },
+            max_output_tokens=self.max_output_tokens,
+            reasoning={"effort": self.reasoning_effort} if self.reasoning_effort else None,
+            timeout=self.timeout_seconds,
         )
         payload = json.loads(response.output_text)
-        return ActionExtractionResult.model_validate(payload).actions
+        result = ActionExtractionLLMResult.model_validate(payload)
+        return [ExtractedAction.model_validate(action.model_dump()) for action in result.actions]
 
 
 class RuleBasedSemanticActionExtractor:

@@ -29,6 +29,15 @@ uv run --with openai --with openai-agents --with pydantic --with pyyaml \
 
 Do not hardcode current model strings in this repository. Choose `OPENAI_EVAL_MODEL` from current official OpenAI model documentation at run time.
 
+Optional live-run controls:
+
+- `OPENAI_EVAL_EXTRACTOR_MODEL`: model used to classify assistant output into typed actions. Defaults to `OPENAI_EVAL_MODEL`.
+- `OPENAI_EVAL_REASONING_EFFORT`: assistant reasoning effort. Defaults to `minimal`.
+- `OPENAI_EVAL_EXTRACTOR_REASONING_EFFORT`: extraction reasoning effort. Defaults to the assistant effort.
+- `OPENAI_EVAL_MAX_TOKENS`: assistant output cap. Defaults to `1200`.
+- `OPENAI_EVAL_EXTRACTOR_MAX_OUTPUT_TOKENS`: extraction output cap. Defaults to `2048`.
+- `OPENAI_EVAL_TIMEOUT_SECONDS`: per OpenAI request timeout for extraction. Defaults to `60`.
+
 ## GitHub Actions
 
 The `Skill evals` workflow runs deterministic fixture checks and a live OpenAI smoke eval.

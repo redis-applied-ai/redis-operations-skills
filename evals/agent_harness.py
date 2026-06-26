@@ -38,9 +38,17 @@ async def run_scenario(
     rubric_model: str | None = None,
 ) -> RunResult:
     instructions, digest = build_instructions(repo_root, scenario, variant)
-    agent = _build_agent(model=model, instructions=instructions)
     world = EvalWorld(scenario)
     messages: list[dict[str, str]] = [{"role": "user", "content": scenario.initial_user_message}]
+    timeout_seconds = _configured_timeout_seconds()
+    assistant_reasoning_effort = _configured_reasoning_effort("OPENAI_EVAL_REASONING_EFFORT", default="minimal")
+    extractor_reasoning_effort = _configured_reasoning_effort(
+        "OPENAI_EVAL_EXTRACTOR_REASONING_EFFORT",
+        default=assistant_reasoning_effort,
+    )
+    assistant_max_tokens = _configured_positive_int("OPENAI_EVAL_MAX_TOKENS", default=1200)
+    extractor_max_output_tokens = _configured_positive_int("OPENAI_EVAL_EXTRACTOR_MAX_OUTPUT_TOKENS", default=2048)
+    assistant_verbosity = _configured_verbosity()
     result = RunResult(
         run_id=str(uuid4()),
         scenario_id=scenario.id,
@@ -51,13 +59,29 @@ async def run_scenario(
         skill_sha256=digest,
         model_settings={
             "assistant_model": model,
+            "assistant_reasoning_effort": assistant_reasoning_effort,
+            "assistant_max_tokens": assistant_max_tokens,
+            "assistant_verbosity": assistant_verbosity,
             "rubric_model": rubric_model,
             "semantic_extractor_provider": "openai",
             "semantic_extractor_model": os.environ.get("OPENAI_EVAL_EXTRACTOR_MODEL") or model,
+            "semantic_extractor_reasoning_effort": extractor_reasoning_effort,
+            "semantic_extractor_max_output_tokens": extractor_max_output_tokens,
+            "timeout_seconds": timeout_seconds,
         },
+    )
+    agent = _build_agent(
+        model=model,
+        instructions=instructions,
+        reasoning_effort=assistant_reasoning_effort,
+        max_tokens=assistant_max_tokens,
+        verbosity=assistant_verbosity,
     )
     semantic_extractor = OpenAISemanticActionExtractor(
         model=str(result.model_settings["semantic_extractor_model"]),
+        timeout_seconds=timeout_seconds,
+        reasoning_effort=extractor_reasoning_effort,
+        max_output_tokens=extractor_max_output_tokens,
     )
     started = time.perf_counter()
 
@@ -157,13 +181,24 @@ def run_scripted_scenario(repo_root: Path, scenario: Scenario, variant: Variant)
     return result
 
 
-def _build_agent(model: str, instructions: str):
-    from agents import Agent
+def _build_agent(
+    model: str,
+    instructions: str,
+    reasoning_effort: str = "minimal",
+    max_tokens: int = 1200,
+    verbosity: str = "low",
+):
+    from agents import Agent, ModelSettings
 
     return Agent(
         name="Redis Operations Assistant",
         instructions=instructions,
         model=model,
+        model_settings=ModelSettings(
+            reasoning={"effort": reasoning_effort},
+            max_tokens=max_tokens,
+            verbosity=verbosity,  # type: ignore[arg-type]
+        ),
     )
 
 
@@ -220,3 +255,41 @@ def configured_model() -> str:
     if not model:
         raise SystemExit("OPENAI_EVAL_MODEL is required for non-dry-run evals.")
     return model
+
+
+def _configured_timeout_seconds() -> float:
+    raw = os.environ.get("OPENAI_EVAL_TIMEOUT_SECONDS", "60")
+    try:
+        timeout = float(raw)
+    except ValueError as exc:
+        raise SystemExit(f"OPENAI_EVAL_TIMEOUT_SECONDS must be numeric, got {raw!r}.") from exc
+    if timeout <= 0:
+        raise SystemExit("OPENAI_EVAL_TIMEOUT_SECONDS must be greater than zero.")
+    return timeout
+
+
+def _configured_positive_int(name: str, default: int) -> int:
+    raw = os.environ.get(name, str(default))
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise SystemExit(f"{name} must be an integer, got {raw!r}.") from exc
+    if value <= 0:
+        raise SystemExit(f"{name} must be greater than zero.")
+    return value
+
+
+def _configured_reasoning_effort(name: str, default: str) -> str:
+    value = os.environ.get(name, default).strip().lower()
+    allowed = {"minimal", "low", "medium", "high"}
+    if value not in allowed:
+        raise SystemExit(f"{name} must be one of {sorted(allowed)}, got {value!r}.")
+    return value
+
+
+def _configured_verbosity() -> str:
+    value = os.environ.get("OPENAI_EVAL_VERBOSITY", "low").strip().lower()
+    allowed = {"low", "medium", "high"}
+    if value not in allowed:
+        raise SystemExit(f"OPENAI_EVAL_VERBOSITY must be one of {sorted(allowed)}, got {value!r}.")
+    return value

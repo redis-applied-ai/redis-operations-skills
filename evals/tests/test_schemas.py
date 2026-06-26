@@ -9,7 +9,15 @@ from pydantic import ValidationError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from schemas import ActionExtractionResult, ActionMatch, ExtractedAction, TargetRef, TransitionRule
+from schemas import (
+    ActionExtractionLLMResult,
+    ActionExtractionResult,
+    ActionMatch,
+    ExtractedAction,
+    TargetRef,
+    TransitionRule,
+    strict_json_schema,
+)
 
 
 def test_extracted_action_requires_known_action_type() -> None:
@@ -65,3 +73,17 @@ def test_action_extraction_result_accepts_typed_actions() -> None:
     )
 
     assert result.actions[0].action_type == "collect_evidence"
+
+
+def test_strict_json_schema_disallows_additional_properties_recursively() -> None:
+    schema = strict_json_schema(ActionExtractionLLMResult)
+
+    assert schema["additionalProperties"] is False
+    assert schema["required"] == ["actions"]
+    assert "default" not in schema["properties"]["actions"]
+    assert schema["$defs"]["ExtractedActionForLLM"]["additionalProperties"] is False
+    assert set(schema["$defs"]["ExtractedActionForLLM"]["required"]) == set(
+        schema["$defs"]["ExtractedActionForLLM"]["properties"]
+    )
+    assert "metadata" not in schema["$defs"]["ExtractedActionForLLM"]["properties"]
+    assert schema["$defs"]["TargetRef"]["additionalProperties"] is False

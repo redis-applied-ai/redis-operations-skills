@@ -113,6 +113,7 @@ def test_rubric_grade_uses_strict_json_schema_and_typed_trace() -> None:
 
     assert grade.overall_pass
     assert client.request["text"]["format"]["strict"] is True
+    assert client.request["text"]["format"]["schema"]["additionalProperties"] is False
     assert "Typed trace JSON" in client.request["input"]
     assert "final_summary" in client.request["input"]
 
